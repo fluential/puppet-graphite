@@ -226,8 +226,9 @@ class graphite::config {
     mode   => '0775',
   }
 
-  if empty($web_local_settings_content) and empty($web_local_settings_source) {
+  if (empty($web_local_settings_content) and empty($web_local_settings_source) ) {
     $web_local_settings_source_real = 'puppet:///modules/graphite/local_settings.py'
+  }
   else {
     $web_local_settings_source_real = $web_local_settings_source
   }
