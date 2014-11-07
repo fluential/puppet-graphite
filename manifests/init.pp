@@ -3,6 +3,13 @@
 # Class to install and configure the Graphite metric aggregation and
 # graphing system.
 #
+# The main difference to usual graphite installations is that we always use instances explicitly here, even if there is only one running
+# That means that you should alway do something like:
+#   * start carbon-cache-a
+#   * start carbon-relay-a
+#
+# This approach simplifies code base
+#
 # === Parameters
 #
 # [*admin_password*]
@@ -54,6 +61,29 @@
 # [*carbon_content*]
 #   Optional: the content of the carbon.conf file.
 #
+# [*cache_instances*]
+#   List of cache instances to be running with its hash config parameters.
+#   Configuration is going to be discovered automatically, you can just specify instances { 'a' => {}, 'b' => {}, 'c' => {} } and job done
+#
+# [*cache_default_override_conf*]
+#   Override default config settings for all instances. Instance specific config can be passed via *cache_instances*
+#
+# [*cache_line_receiver_port*]
+#   Carbon cache LINE_RECEIVER_PORT - this is also used as a starting port to increment from for additional instances
+#
+# [*cache_pickle_receiver_port*]
+#   Carbon cache PICKLE_RECEIVER_PORT - this is also used as a starting port to increment from for additional instances
+#
+# [*cache_query_port*]
+#   Carbon cache CACHE_QUERY_PORT - this is also used as a starting port to increment from for additional instances
+#
+# [*relay_instances*]
+#   List of relay instances to be running with its hash config parameters
+#   Configuration is going to be discovered automatically, you can just specify instances { 'a' => {}, 'b' => {}, 'c' => {} } and job done
+#
+# [*relay_default_override_conf*]
+#   Override default config settings for all instances. Instance specific config can be passed via *relay_instances*
+#
 # [*carbon_source*]
 #   Optional: the source of the carbon.conf file.
 #
@@ -99,10 +129,19 @@ class graphite(
   $storage_schemas_source = undef,
   $carbon_source = undef,
   $carbon_content = undef,
+  $cache_line_receiver_port = 2003,
+  $cache_pickle_receiver_port = 2004,
+  $cache_query_port = 7002,
+  $relay_line_receiver_port = 2013,
+  $relay_pickle_receiver_port = 2014,
+  $cache_instances = {'a' => {} },
+  $relay_instances = {},
+  $cache_default_override_conf = {},
+  $relay_default_override_conf = {},
   $version = $graphite::params::version,
   $user = $graphite::params::user,
   $group = $graphite::params::group,
-  $manage_user = false,
+  $manage_user = true,
   $use_python_pip = true,
   $whisper_pkg_name = 'whisper',
   $carbon_pkg_name = 'carbon',
@@ -114,7 +153,16 @@ class graphite(
     $user,
     $group,
   )
+
+  if empty($cache_instances) { fail('You need to provide at least one cache instance, configuration hash can be empty, defaults will be used') }
   validate_bool($manage_user)
+  validate_hash($cache_default_override_conf)
+  validate_hash($cache_instances)
+  validate_hash($relay_instances)
+
+  #  if ( (!empty($cache_instances) and empty($cache_destinations))  or (empty($cache_instances) and !empty($cache_destinations)) ) {
+  #   fail('You need to provide both $cache_instances and $cache_destinations to configure cluster') 
+  #}
 
   if $::graphite::manage_user {
     class{'graphite::user':}
