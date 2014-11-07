@@ -58,7 +58,7 @@ class { 'graphite':
 
 If you want to spawn multiple carbon cache and relay instances:
 
-```
+```puppet
 class {'graphite':
    root_dir => '/var/lib/graphite'
    cache_instances => {'a' => {}, 'b' => {}, 'c' => {} }
