@@ -27,6 +27,12 @@
 #   Where to install Graphite.
 #   Default: /opt/graphite
 #
+# [*web_local_settings_content*]
+#   Graphite web local_settings.py content
+#
+# [*web_local_settings_source*]
+#   Graphite web local_settings.py source
+#
 # [*carbon_aggregator*]
 #   Optional: Boolean, whether to run carbon-aggregator. You will need to
 #   provide an appropriate `carbon_content` or `carbon_source` config.
@@ -117,6 +123,8 @@ class graphite(
   $bind_address = $graphite::params::bind_address,
   $port = $graphite::params::port,
   $root_dir = $graphite::params::root_dir,
+  $web_local_settings_content = undef,
+  $web_local_settings_souce = undef,
   $carbon_aggregator = false,
   $carbon_max_cache_size = 'inf',
   $carbon_max_creates_per_minute = 'inf',

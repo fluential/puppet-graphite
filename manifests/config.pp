@@ -8,6 +8,8 @@ class graphite::config {
   $bind_address                   = $::graphite::bind_address
   $port                           = $::graphite::port
   $root_dir                       = $::graphite::root_dir
+  $web_local_settings_content     = $::graphite::web_local_settings_content
+  $web_local_settings_source      = $::graphite::web_local_settings_source
   $user                           = $::graphite::user
   $group                          = $::graphite::group
   $carbon_max_cache_size          = $::graphite::carbon_max_cache_size
@@ -224,9 +226,16 @@ class graphite::config {
     mode   => '0775',
   }
 
+  if empty($web_local_settings_content) and empty($web_local_settings_source) {
+    $web_local_settings_source_real = 'puppet:///modules/graphite/local_settings.py'
+  else {
+    $web_local_settings_source_real = $web_local_settings_source
+  }
+
   file { "${root_dir}/webapp/graphite/local_settings.py":
     ensure  => present,
-    source  => 'puppet:///modules/graphite/local_settings.py',
+    source  => $web_local_settings_source_real,
+    content => $web_local_settings_content,
     owner   => $::graphite::user,
     group   => $::graphite::group,
     mode    => '0444',
