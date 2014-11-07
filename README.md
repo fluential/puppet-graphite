@@ -11,6 +11,10 @@ That means that you should alway do something like:
  * start carbon-relay-a
 
 All cache / relay instances will get their own set of configuration which can be globally via cache_default_override_conf and relay_default_override_conf or per instance specific config hash.
+
+# TODO:
+ * Fix puppet-rspec tests to match new configuration
+
 # Usage
 
 You will need Python, Python's development headers/libs, pip and virtualenv
