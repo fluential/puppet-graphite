@@ -4,6 +4,13 @@ A Puppet module for managing the installation of
 [![Build
 Status](https://secure.travis-ci.org/gds-operations/puppet-graphite.png)](http://travis-ci.org/gds-operations/puppet-graphite)
 
+The main difference to the usual graphite installations is that we always use instances explicitly here, even if there is only one running
+
+That means that you should alway do something like:
+ * start carbon-cache-a
+ * start carbon-relay-a
+
+All cache / relay instances will get their own set of configuration which can be globally via cache_default_override_conf and relay_default_override_conf or per instance specific config hash.
 # Usage
 
 You will need Python, Python's development headers/libs, pip and virtualenv
@@ -47,6 +54,21 @@ class { 'graphite':
 }
 ```
 
+## Cluster setup
+
+If you want to spawn multiple carbon cache and relay instances:
+
+```
+class {'graphite':
+   root_dir => '/var/lib/graphite'
+   cache_instances => {'a' => {}, 'b' => {}, 'c' => {} }
+   relay_instances => {
+       'a' => {
+           'DESTINATIONS' = '1.2.3.4:2004:a, 5.6.7.8:3004:b' },
+       'b' => {}
+   }
+}
+```
 ## Another Graphite module?
 
 Graphite can be painfull to install and many blog posts and gists are
